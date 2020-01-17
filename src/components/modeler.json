@@ -1,0 +1,43 @@
+{
+  "name": "Modeler",
+  "uri": "http://flowable.org/modeler",
+  "prefix": "modeler",
+  "xml": {
+    "tagAlias": ""
+  },
+  "types": [
+    {
+      "name": "initiator-can-complete",
+      "superClass": [ "Element" ],
+      "meta": {
+        "allowedIn": [
+          "bpmn:UserTask"
+        ]
+      },
+      "properties": [
+        {
+          "name": "id",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "name",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "modeler",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "body",
+          "type": "String",
+          "isBody": true
+        }
+      ]
+    }
+  ],
+  "emumerations": [],
+  "associations": []
+}
