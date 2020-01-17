@@ -5,6 +5,7 @@ import HelloWorldPro from '@/components/HelloWorldPro'
 import makingForm from '@/views/makingForm'
 import generate from  '@/views/fm-generate'
 import draggable from  '@/views/draggable'
+import viewer from  '@/components/viewer'
 Vue.use(Router)
 
 export default new Router({
@@ -33,6 +34,11 @@ export default new Router({
       path:'/draggable',
       name:'draggable',
       component:draggable
+    },
+    {
+      path:'/viewer',
+      name:'viewer',
+      component:viewer
     }
   ]
 })

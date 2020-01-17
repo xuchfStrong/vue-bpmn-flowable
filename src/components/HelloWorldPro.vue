@@ -68,9 +68,16 @@ export default {
           throw err;
         }
         this.bpmnModeler.get("canvas").zoom("fit-viewport");
-        var eventBus = this.bpmnModeler.get("eventBus");
+        let eventBus = this.bpmnModeler.get("eventBus");
 
-        var events = ["element.click", "element.dblclick"];
+        let events = [
+          "element.click",
+          "element.dblclick"
+          // 'element.hover',
+          // 'element.out',
+          // 'element.mousedown',
+          // 'element.mouseup'
+          ]
         events.forEach(event => {
           eventBus.on(event, e => {
             // console.log(event, 'on', e.element.id)
