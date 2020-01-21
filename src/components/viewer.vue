@@ -1,12 +1,24 @@
 <template>
   <div class="containers" ref="content">
-    <button @click="createNewDiagram(bpmnViewer)">加载</button>
-    <button @click="zoomIn()">缩小</button>
-    <button @click="zoomOut()">放大</button>
-    <button @click="zoomBack()">适配</button>
+    <div class="button-group">
+      <li @click="createNewDiagram()" class="button-wrap" title="加载"><i class="el-icon-folder-opened"/>
+      </li><li @click="createNewDiagram()" class="button-wrap" title="刷新"><i class="el-icon-refresh-right"/>
+      </li><li @click="zoomIn()" class="button-wrap" title="缩小"><i class="el-icon-zoom-out"/>
+      </li><li @click="zoomOut()" class="button-wrap" title="放大"><i class="el-icon-zoom-in"/>
+      </li><li @click="zoomBack()" class="button-wrap" title="重置"><i class="el-icon-aim"/>
+      </li><li @click="zoomBack()" class="button-wrap" title="保存为Diagram">
+        <a ref="saveDiagram" href="javascript:" title="download BPMN diagram"><i class="el-icon-download"/></a>
+      </li><li @click="zoomBack()" class="button-wrap" title="保存为SVG格式"><i class="el-icon-picture-outline"/></li>
+    </div>
+    <el-button-group>
+      <el-button type="info" title="加载" icon="el-icon-refresh-right" size="medium" @click="createNewDiagram(bpmnViewer)"></el-button>
+      <el-button type="info" title="缩小" icon="el-icon-zoom-out" size="medium" @click="zoomIn()"></el-button>
+      <el-button type="info" title="放大" icon="el-icon-zoom-in" size="medium" @click="zoomOut()"></el-button>
+      <el-button type="info" title="重置" icon="el-icon-aim" size="medium" @click="zoomBack()"></el-button>
+    </el-button-group>
     <div class="toolbar">
       <a title="download">下载</a>
-      <a ref="saveDiagram" href="javascript:" title="download BPMN diagram">BPMN</a>
+      <!-- <a ref="saveDiagram" href="javascript:" title="download BPMN diagram">BPMN</a> -->
       <a ref="saveSvg" href="javascript:" title="download as SVG image">SVG</a>
     </div>
     <vue-drag-resize @resizestop="resizeStop" @resizing="resizing" v-bind:style="styleObject">
@@ -21,7 +33,7 @@
 import BpmnViewer from 'bpmn-js'
 import axios from 'axios'
 import VueDragResize from 'vue-drag-resize'
-import {diagramXML} from './xml'
+import {diagramXML} from './resource/xml'
 
 export default {
   components: { VueDragResize },
@@ -217,5 +229,30 @@ export default {
   .active {
     width: 500px;
     height: 200px;
+  }
+  .button-group {
+    border: solid 1px #E0E0E0;
+    display:inline-block;
+    margin: 3px;
+  }
+  .button-wrap {
+    &:hover{
+      // background: rgba(144, 146, 152, 0.85);
+      color: rgb(92, 182, 255);
+    }
+    &:last-child{
+      border-right: none;
+    }
+    a:visited {
+      color:#555555;
+    }
+    font-size:22px;
+    display:inline-block;
+    background: #ffffff;
+    color:#555555;
+    padding: 0 10px;
+    margin: 3px 0;
+    cursor: pointer;
+    border-right: solid 1px #E0E0E0;
   }
 </style>

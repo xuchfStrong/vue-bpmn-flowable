@@ -6,6 +6,7 @@ import makingForm from '@/views/makingForm'
 import generate from  '@/views/fm-generate'
 import draggable from  '@/views/draggable'
 import viewer from  '@/components/viewer'
+import ViewerPro from  '@/components/ViewerPro'
 Vue.use(Router)
 
 export default new Router({
@@ -39,6 +40,11 @@ export default new Router({
       path:'/viewer',
       name:'viewer',
       component:viewer
+    },
+    {
+      path:'/ViewerPro',
+      name:'ViewerPro',
+      component:ViewerPro
     }
   ]
 })

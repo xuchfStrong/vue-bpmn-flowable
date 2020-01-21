@@ -39,7 +39,7 @@
 <script>
 // 引入相关的依赖
 import BpmnModeler from "bpmn-js/lib/Modeler";
-import activitiModdleDescriptor from "./activiti.json";
+import activitiModdleDescriptor from "./resource/activiti.json";
 import { getBusinessObject } from "bpmn-js/lib/util/ModelUtil";
 import panel from "./panel";
 export default {

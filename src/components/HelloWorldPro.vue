@@ -39,8 +39,8 @@
 <script>
 // 引入相关的依赖
 import BpmnModeler from "bpmn-js/lib/Modeler";
-import flowableModdleDescriptor from "./flowable.json";
-import modelerDescriptor from "./modeler.json";
+import flowableModdleDescriptor from "./resource/flowable.json";
+import modelerDescriptor from "./resource/modeler.json";
 import customTranslate from './translate';
 import customControlsModule from './custom';
 import { getBusinessObject } from "bpmn-js/lib/util/ModelUtil";

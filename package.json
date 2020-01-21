@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "axios": "^0.19.1",
-    "bpmn-js": "^2.5.1",
+    "bpmn-js": "^6.1.1",
+    "diagram-js": "^6.2.2",
     "element-ui": "^2.4.11",
     "form-making": "^1.2.7",
     "vue": "^2.5.2",

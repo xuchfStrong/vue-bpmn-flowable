@@ -186,8 +186,8 @@ export default {
       conditionType:'',
       conditionExpressionList: [
         {id: 1, value: '${processTransferType=="1"}'},
-        {id: 2, value: '<![CDATA[${processTransferType=="2"}]]>'},
-        {id: 3, value: '<![CDATA[${processTransferType=="3"}]]>'}
+        {id: 2, value: '${processTransferType=="2"}'},
+        {id: 3, value: '${processTransferType=="3"}'}
       ],
       // isInitiatorCanComplete: true, // 发起人是否能结束
       initiatorCanComplete: '', // <modeler:initiator-can-complete> 属性
