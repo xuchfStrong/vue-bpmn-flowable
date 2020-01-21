@@ -1,4 +1,4 @@
-<!--  -->
+<!-- ViewerPro.vue -->
 <template>
   <div class="containers" ref="content">
     <div class="canvas" ref="canvas"></div>
@@ -131,12 +131,11 @@ export default {
       let passedIds = []
       let passedObj = this.getPassedObj(id, sequenceFlows)
       passedIds = passedIds.concat(passedObj.passedIds)
-      let sourceRefType = passedObj.sourceRefType
  
-      while (sourceRefType !== 'bpmn:StartEvent') {
+      for (let i = 1; i < 100; i++) { // 设置循环100次，为了避免死循环
         passedObj = this.getPassedObj(passedObj.sourceRefId, sequenceFlows)
-        sourceRefType = passedObj.sourceRefType
         passedIds = passedIds.concat(passedObj.passedIds)
+        if (passedObj.sourceRefType === 'bpmn:StartEvent') break
       }
       return passedIds
     }
