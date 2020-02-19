@@ -24,6 +24,9 @@
           <a slot="trigger" ref="import" href="javascript:" title="download as SVG image">导入BPMN</a>
         </li>
       </el-upload>
+      <li>
+        <el-button type="default" @click="viewDiagram">查看</el-button>
+      </li>
     </ul>
     <!-- panel为自定义属性面板，需要传入element，businessObject，moddle，modeling（后面会提及） -->
     <panel
@@ -32,7 +35,17 @@
       :businessObject="businessObject"
       :moddle="moddle"
       :modeling="modeling"
+      :event="event"
     />
+
+    <el-dialog
+      title="流程图代码"
+      fullscreen
+      :visible.sync="dialogVisible">
+      <div style="white-space: pre-wrap; font-family:SimSun; font-size: 12px; color: #000;">{{ diagram }}</div>
+      <!-- <el-input v-model="diagram" type="textarea" :rows="20" readonly></el-input> -->
+    </el-dialog>
+    
   </div>
 </template>
 
@@ -44,6 +57,7 @@ import modelerDescriptor from "./resource/modeler.json";
 import customTranslate from './translate';
 import customControlsModule from './custom';
 import { getBusinessObject } from "bpmn-js/lib/util/ModelUtil";
+import { isAny } from "bpmn-js/lib/features/modeling/util/ModelingUtil";
 import panel from "./panel";
 
 export default {
@@ -52,12 +66,15 @@ export default {
     return {
       businessObject: null,
       element: null,
+      event: null,
       moddle: null,
       modeling: null,
       // bpmn建模器
       bpmnModeler: null,
       container: null,
-      canvas: null
+      canvas: null,
+      dialogVisible: false,
+      diagram: ''
     };
   },
   methods: {
@@ -102,6 +119,7 @@ export default {
         }
         _this.moddle = _this.bpmnModeler.get("moddle");
         _this.modeling = _this.bpmnModeler.get("modeling");
+        _this.addEventBusListener()
       });
     },
     // 下载为SVG格式,done是个函数，调用的时候传入的
@@ -141,6 +159,30 @@ export default {
           }
         });
       };
+    },
+    // 查看流程图代码
+    viewDiagram() {
+      this.dialogVisible = true
+    },
+    addEventBusListener() {
+      // 监听 element
+      let that = this
+      const eventBus = this.bpmnModeler.get('eventBus')
+      const modeling = this.bpmnModeler.get('modeling')
+      const elementRegistry = this.bpmnModeler.get('elementRegistry')
+      // const eventTypes = ['element.click', 'element.changed']
+      const eventTypes = Object.keys(eventBus._listeners)
+      eventTypes.forEach(function(eventType) {
+        eventBus.on(eventType, function(e) {
+          // console.log('e', e)
+          // try {
+          //   if (e.element.businessObject.$type !== 'bpmn:Process') {
+          //     console.log('e', e)
+          //   }
+          // } catch(error) {
+          // }
+        })
+      })
     }
   },
   mounted() {
@@ -174,7 +216,8 @@ export default {
       });
 
       _this.saveDiagram(function(err, xml) {
-        console.log("xml-------", err, xml);
+        // console.log("xml-------", err, xml);
+        _this.diagram = xml
         _this.setEncoded(downloadLink, "diagram.bpmn", err ? null : xml);
       });
     });
@@ -188,6 +231,20 @@ export default {
         _this.$refs.panel.init();
       });
     });
+    // 改变节点类型
+    this.bpmnModeler.on("commandStack.shape.replace.postExecuted", event => {
+      _this.event = event
+      _this.$nextTick(() => {
+        _this.$refs.panel.handleReplace()
+      })
+    })
+    // 改变节点属性
+    this.bpmnModeler.on("commandStack.element.updateProperties.postExecute", event => {
+      _this.event = event
+      _this.$nextTick(() => {
+        _this.$refs.panel.showPostUpdateProperties()
+      })
+    })
     this.createNewDiagram(this.bpmnModeler);
   }
 };
@@ -278,9 +335,9 @@ export default {
 .djs-context-pad.open {
   .bpmn-icon-gateway-none,
   .bpmn-icon-task,
-  .bpmn-icon-start-event-none,
-  .bpmn-icon-end-event-none,
-  .bpmn-icon-intermediate-event-none {
+  // .bpmn-icon-end-event-none,
+  // .bpmn-icon-intermediate-event-none,
+  .bpmn-icon-start-event-none {
     display: none;
   }
 }

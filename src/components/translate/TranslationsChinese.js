@@ -99,6 +99,7 @@ export default {
   'Create UserTask': '创建用户任务',
   'Create Group': '创建组',
   'Append ServiceTask': '添加服务任务',
+  'Append EndEvent': '添加结束节点',
   'Append UserTask': '添加用户任务',
   'Default Flow': '默认流程',
   'Conditional Flow': '条件流程',

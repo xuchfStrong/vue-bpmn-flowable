@@ -15,7 +15,17 @@
           <a slot="trigger" ref="import" href="javascript:" title="download as SVG image">导入BPMN</a>
         </li>
       </el-upload>
+      <li>
+        <el-button type="default" @click="viewDiagram">查看</el-button>
+      </li>
     </ul>
+
+    <el-dialog
+      title="流程图代码"
+      fullscreen
+      :visible.sync="dialogVisible">
+      <div style="white-space: pre-wrap; font-family:SimSun; font-size: 12px; color: #000;">{{ diagram }}</div>
+    </el-dialog>
   </div>
 </template>
 
@@ -37,7 +47,9 @@ export default {
       container: null,
       canvas: null,
       xmlStr: null,
-      processName: ''
+      processName: '',
+      dialogVisible: false,
+      diagram: ''
     }
   },
   methods: {
@@ -152,6 +164,10 @@ export default {
         })
       };
     },
+    // 查看流程图代码
+    viewDiagram() {
+      this.dialogVisible = true
+    }
   },
   mounted () {
     // 获取到属性ref为“content”的dom节点
@@ -190,6 +206,7 @@ export default {
 
       _this.saveDiagram(function (err, xml) {
         console.log(xml)
+        _this.diagram = xml
         var jsonObj = _this.$x2js.xml2js(xml)
         _this.getFormProperty(jsonObj)
         let newXml = '<?xml version="1.0" encoding="UTF-8"?>'+_this.$x2js.js2xml(jsonObj)

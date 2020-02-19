@@ -54,6 +54,11 @@
       },
       "properties": [
         {
+          "name": "id",
+          "type": "String",
+          "isAttr": true
+        },
+        {
           "name": "expression",
           "isAttr": true,
           "type": "String"
@@ -158,6 +163,11 @@
           "name": "default",
           "type": "String",
           "isAttr": true
+        },
+        {
+          "name": "isForCompensation",
+          "type": "String",
+          "isAttr": true
         }
       ]
     },
@@ -185,42 +195,145 @@
       ],
       "properties": [
         {
-          "name": "candidateGroups",
+          "name": "category",
           "isAttr": true,
           "type": "String"
         },
         {
-          "name": "candidateUser",
+          "name": "formFieldValidation",
           "isAttr": true,
           "type": "String"
-        },
+        }
+      ]
+    },
+    {
+      "name": "Assignable",
+      "extends": [ "bpmn:UserTask" ],
+      "properties": [
         {
           "name": "assignee",
           "isAttr": true,
           "type": "String"
         },
         {
-          "name": "exclusive",
+          "name": "candidateUsers",
           "isAttr": true,
-          "type": "Boolean"
+          "type": "String"
+        },
+        {
+          "name": "candidateGroups",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "dueDate",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "followUpDate",
+          "isAttr": true,
+          "type": "String"
         },
         {
           "name": "priority",
           "isAttr": true,
-          "type": "Integer"
-        },
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "AsyncCapable",
+      "isAbstract": true,
+      "extends": [
+        "bpmn:Activity",
+        "bpmn:Gateway",
+        "bpmn:Event"
+      ],
+      "properties": [
         {
-          "name": "category",
+          "name": "async",
           "isAttr": true,
-          "type": "Integer"
+          "type": "Boolean",
+          "default": false
         },
         {
-          "name": "formFieldValidation",
+          "name": "exclusive",
+          "isAttr": true,
+          "type": "Boolean",
+          "default": true
+        }
+      ]
+    },
+    {
+      "name": "Collectable",
+      "isAbstract": true,
+      "extends": [ "bpmn:MultiInstanceLoopCharacteristics" ],
+      "superClass": [ "flowable:AsyncCapable" ],
+      "properties": [
+        {
+          "name": "collection",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "elementVariable",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "SkipExpress",
+      "isAbstract": true,
+      "extends": [
+        "bpmn:ServiceTask",
+        "bpmn:UserTask"
+      ],
+      "properties": [
+        {
+          "name": "skipExpression",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "ServiceTaskLike",
+      "extends": [
+        "bpmn:ServiceTask",
+        "bpmn:BusinessRuleTask",
+        "bpmn:SendTask",
+        "bpmn:MessageEventDefinition"
+      ],
+      "properties": [
+        {
+          "name": "expression",
           "isAttr": true,
           "type": "String"
         },
         {
           "name": "class",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "delegateExpression",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "resultVariableName",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "triggerable",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "useLocalScopeForResultVariable",
           "isAttr": true,
           "type": "String"
         }
