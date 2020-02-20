@@ -32,8 +32,9 @@
         },
         {
           "name": "body",
-          "type": "String",
-          "isBody": true
+          "isBody": true,
+          "type": "Boolean",
+          "default": false
         }
       ]
     }

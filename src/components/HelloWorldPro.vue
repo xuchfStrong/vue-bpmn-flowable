@@ -56,7 +56,7 @@ import flowableModdleDescriptor from "./resource/flowable.json";
 import modelerDescriptor from "./resource/modeler.json";
 import customTranslate from './translate';
 import customControlsModule from './custom';
-import { getBusinessObject } from "bpmn-js/lib/util/ModelUtil";
+import { getBusinessObject, is } from "bpmn-js/lib/util/ModelUtil";
 import { isAny } from "bpmn-js/lib/features/modeling/util/ModelingUtil";
 import panel from "./panel";
 
@@ -119,7 +119,7 @@ export default {
         }
         _this.moddle = _this.bpmnModeler.get("moddle");
         _this.modeling = _this.bpmnModeler.get("modeling");
-        _this.addEventBusListener()
+        // _this.addEventBusListener()
       });
     },
     // 下载为SVG格式,done是个函数，调用的时候传入的
@@ -175,6 +175,7 @@ export default {
       eventTypes.forEach(function(eventType) {
         eventBus.on(eventType, function(e) {
           // console.log('e', e)
+          if (!is(e.element, 'bpmn:Process')) console.log('e', e)
           // try {
           //   if (e.element.businessObject.$type !== 'bpmn:Process') {
           //     console.log('e', e)
@@ -333,7 +334,7 @@ export default {
 
 // 隐藏contextPad中不需要的元素
 .djs-context-pad.open {
-  .bpmn-icon-gateway-none,
+  // .bpmn-icon-gateway-none,
   .bpmn-icon-task,
   // .bpmn-icon-end-event-none,
   // .bpmn-icon-intermediate-event-none,

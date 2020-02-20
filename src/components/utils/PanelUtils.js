@@ -14,15 +14,19 @@ export function isShouldShowProperty(property, businessObject) {
     elementType = ['bpmn:StartEvent', 'bpmn:UserTask']
   }
 
-  if (property === 'exclusive') {
-    elementType = ['bpmn:ServiceTask', 'bpmn:UserTask']
+  if (['exclusive', 'async'].includes(property)) {
+    elementType = ['bpmn:Activity', 'bpmn:Gateway']
+  }
+
+  if (property === 'dueDate') {
+    elementType = ['bpmn:UserTask']
   }
 
   if (property === 'assignee') {
     elementType = ['bpmn:UserTask']
   }
 
-  if (property === 'candidateUser') {
+  if (property === 'candidateUsers') {
     elementType = ['bpmn:UserTask']
   }
 
@@ -36,10 +40,6 @@ export function isShouldShowProperty(property, businessObject) {
 
   if (property === 'category') {
     elementType = ['bpmn:UserTask']
-  }
-
-  if (property === 'async') {
-    elementType = ['bpmn:UserTask', 'bpmn:ServiceTask']
   }
 
   if (property === 'isForCompensation') {
@@ -56,24 +56,54 @@ export function isShouldShowProperty(property, businessObject) {
   }
 
   if (property === 'multiInstance') {
-    elementType = ['bpmn:UserTask', 'bpmn:ServiceTask']
+    elementType = ['bpmn:Activity']
   }
 
   if (property === 'listener') {
-    elementType = ['bpmn:StartEvent', 'bpmn:Activity']
+    elementType = ['bpmn:Event', 'bpmn:Activity', 'bpmn:Gateway']
   }
 
   if (property === 'TaskListener') {
     elementType = ['bpmn:UserTask']
   }
+
+  if (property === 'SequenceFlow') {
+    elementType = ['bpmn:SequenceFlow']
+  }
   return isAny(businessObject, elementType)
 }
 
-
+/**
+ * 根据类型判断是否显示
+ * @param {String} type 
+ * @param {Object} businessObject 
+ */
 export function isShouldShowByType(type, businessObject) {
   let res = false
   if (type === 'MultiInstanceLoopCharacteristics') {
     res =  is(businessObject.loopCharacteristics, 'bpmn:MultiInstanceLoopCharacteristics')
   }
+  if (type === 'conditionExpression') {
+    res =  businessObject.conditionExpression? true:false
+  }
   return res
 }
+
+export function getExtension(businessObject, type) {
+  if (!businessObject.extensionElements) {
+    return null;
+  }
+  return businessObject.extensionElements.values.filter(function(e) {
+    return e.$instanceOf(type);
+  })[0]
+}
+
+export function getExtensionAll(businessObject, type) {
+  if (!businessObject.extensionElements) {
+    return null;
+  }
+  return businessObject.extensionElements.values.filter(function(e) {
+    return e.$instanceOf(type);
+  })
+}
+

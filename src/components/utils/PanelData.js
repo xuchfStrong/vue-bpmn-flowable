@@ -1,3 +1,4 @@
 export const showProperty = {
-  MultiInstanceLoopCharacteristics: false
+  MultiInstanceLoopCharacteristics: false,
+  conditionExpression: false
 }

@@ -1,30 +1,30 @@
 <template>
   <div v-if="show" class="panelWrapper">
-    <div class="panelHeader">{{businessObject.id}}</div>
-    <el-form class="panelForm" :model="businessObject" label-position="top">
+    <div class="panelHeader">{{form.id}}</div>
+    <el-form class="panelForm" :model="form" label-position="top">
       <el-tabs v-model="activeName">
         <el-tab-pane label="基本" name="general">
           <el-form-item label="Id">
-            <el-input size="mini" v-model="businessObject.id" @change="v=>updateAttr('id',v)"></el-input>
+            <el-input size="mini" v-model="form.id" @change="v=>updateAttr('id',v)"></el-input>
           </el-form-item>
           <el-form-item label="名称">
-            <el-input size="mini" v-model="businessObject.name" @change="v=>updateAttr('name',v)"></el-input>
+            <el-input size="mini" v-model="form.name" @change="v=>updateAttr('name',v)"></el-input>
           </el-form-item>
-          <el-form-item label="描述" v-if="businessObject.documentation&&businessObject.documentation[0]">
-            <el-input type="textarea" size="mini" autosize v-model="businessObject.documentation[0].text" @change="v=>updateAttr('documentation',businessObject.documentation)"></el-input>
+          <el-form-item label="描述" v-if="form.documentation&&form.documentation[0]">
+            <el-input type="textarea" size="mini" v-model="form.documentation[0].text" @change="v=>updateAttr('documentation',form.documentation)"></el-input>
           </el-form-item>
           
           <template v-if="['bpmn:StartEvent'].includes(businessObject.$type)">
             <template v-if="startEventType=='bpmn:TimerEventDefinition'">
-              <el-form-item label="时间定义类型">
+              <el-form-item label="Timer Definition Type">
                 <el-select size="mini" style="width:100%" v-model="timeDefinitionType" placeholder="请选择" @change="updateTime">
-                  <el-option v-for="item in timeDefinitionTypeList" :key="item.value"
-                    :label="item.name" :value="item.value">
+                  <el-option v-for="item in timeDefinitionTypeList" :key="item"
+                    :label="item" :value="item">
                   </el-option>
                 </el-select>
               </el-form-item>
               <template v-if="timeDefinitionType">
-                <el-form-item label="时间设置" required>
+                <el-form-item label="Timer Definition" required>
                   <el-date-picker size="mini" style="width:100%" value-format="yyyy-MM-dd HH:mm:ss" v-if="timeDefinitionType=='Date'" v-model="FormalExpression.body" @change="updateProperties"
                     type="datetime" placeholder="请选择">
                   </el-date-picker>
@@ -39,49 +39,46 @@
             </template>
           </template>
 
-          <el-checkbox v-if="shouldShowProperty('formFieldValidation')" v-model="businessObject.formFieldValidation" class="item-wrap" @change="v=>updateAttr('formFieldValidation',v)">是否验证表单</el-checkbox>
-          <el-checkbox v-if="shouldShowProperty('exclusive')" v-model="businessObject.exclusive" class="item-wrap" @change="v=>updateAttr('exclusive',v)">是否独占任务</el-checkbox>
-          <el-checkbox v-if="shouldShowProperty('async')" v-model="businessObject.async" class="item-wrap" @change="v=>updateAttr('async',v)">是否异步</el-checkbox>
-          <el-checkbox v-if="shouldShowProperty('isForCompensation')" v-model="businessObject.isForCompensation" class="item-wrap" @change="v=>updateAttr('isForCompensation',v)">是否为补偿</el-checkbox>
-          <el-checkbox v-if="shouldShowProperty('useLocalScopeForResultVariable')" v-model="businessObject.useLocalScopeForResultVariable" class="item-wrap" @change="v=>updateAttr('useLocalScopeForResultVariable',v)">对结果变量使用局部作用域</el-checkbox>
-          <el-checkbox v-if="shouldShowProperty('triggerable')" v-model="businessObject.triggerable" class="item-wrap" @change="v=>updateAttr('triggerable',v)">将服务设置为可触发的</el-checkbox>
+          <el-checkbox v-if="shouldShowProperty('formFieldValidation')" v-model="form.formFieldValidation" class="item-wrap" @change="v=>updateAttr('formFieldValidation',v)">是否验证表单</el-checkbox>
+          <el-checkbox v-if="shouldShowProperty('exclusive')" v-model="form.exclusive" class="item-wrap" @change="v=>updateAttr('exclusive',v)">是否独占任务</el-checkbox>
+          <el-checkbox v-if="shouldShowProperty('async')" v-model="form.async" class="item-wrap" @change="v=>updateAttr('async',v)">是否异步</el-checkbox>
+          <el-checkbox v-if="shouldShowProperty('isForCompensation')" v-model="form.isForCompensation" class="item-wrap" @change="v=>updateAttr('isForCompensation',v)">是否为补偿</el-checkbox>
+          <el-checkbox v-if="shouldShowProperty('useLocalScopeForResultVariable')" v-model="form.useLocalScopeForResultVariable" class="item-wrap" @change="v=>updateAttr('useLocalScopeForResultVariable',v)">对结果变量使用局部作用域</el-checkbox>
+          <el-checkbox v-if="shouldShowProperty('triggerable')" v-model="form.triggerable" class="item-wrap" @change="v=>updateAttr('triggerable',v)">将服务设置为可触发的</el-checkbox>
 
           <el-form-item v-if="shouldShowProperty('dueDate')" label="到期时间">
-            <!-- <el-input size="mini" v-model="businessObject.dueDate" @change="v=>updateAttr('dueDate',v)"></el-input> -->
-            <el-date-picker size="mini" style="width:100%" value-format="yyyy-MM-dd HH:mm:ss" v-model="businessObject.dueDate" @change="v=>updateAttr('dueDate',v)"
-              type="datetime" placeholder="请选择">
-            </el-date-picker>
+            <el-input size="mini" v-model="form.dueDate" @change="v=>updateAttr('dueDate',v)"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('assignee')" label="分配用户">
-            <el-input size="mini" v-model="businessObject.assignee" @change="v=>updateAttr('assignee',v)"></el-input>
+            <el-input size="mini" v-model="form.assignee" @change="v=>updateAttr('assignee',v)"></el-input>
           </el-form-item>
-          <el-checkbox v-if="showIniatorCanComplete" v-model="initiatorCanComplete.checked" class="item-wrap" @change="v=>updateInitiatorCanComplete(v)">发起人能否结束流程</el-checkbox>
-          <el-form-item v-if="shouldShowProperty('candidateUsers')" label="候选人">
-            <el-input size="mini" v-model="businessObject.candidateUsers" @change="v=>updateAttr('candidateUsers',v)"></el-input>
+          <el-checkbox v-if="showIniatorCanComplete" v-model="initiatorCanComplete.checked" class="item-wrap" @change="initiatorCanCompleteChange">发起人能否结束流程</el-checkbox>
+          <el-form-item v-if="shouldShowProperty('candidateUser')" label="候选人">
+            <el-input size="mini" v-model="form.candidateUser" @change="v=>updateAttr('candidateUser',v)"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('candidateGroups')" label="候选群">
-            <el-input size="mini" v-model="businessObject.candidateGroups" @change="v=>updateAttr('candidateGroups',v)"></el-input>
+            <el-input size="mini" v-model="form.candidateGroups" @change="v=>updateAttr('candidateGroups',v)"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('priority')" label="优先级">
-            <el-input size="mini" type="number" v-model="businessObject.priority" @change="v=>updateAttr('priority',v)" min="1" max="100"></el-input>
+            <el-input size="mini" type="number" v-model="form.priority" @change="v=>updateAttr('priority',v)" min="1" max="100"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('category')" label="分类">
-            <el-input size="mini" v-model="businessObject.category" @change="v=>updateAttr('category',v)"></el-input>
+            <el-input size="mini" v-model="form.category" @change="v=>updateAttr('category',v)"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('expression')" label="表达式">
-            <el-input size="mini" v-model="businessObject.expression" @change="v=>updateAttr('expression',v)"></el-input>
+            <el-input size="mini" v-model="form.expression" @change="v=>updateAttr('expression',v)"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('skipExpression')" label="跳过表达式">
-            <el-input size="mini" v-model="businessObject.skipExpression" @change="v=>updateAttr('skipExpression',v)"></el-input>
+            <el-input size="mini" v-model="form.skipExpression" @change="v=>updateAttr('skipExpression',v)"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('delegateExpression')" label="代理表达式">
-            <el-input size="mini" v-model="businessObject.delegateExpression" @change="v=>updateAttr('delegateExpression',v)"></el-input>
+            <el-input size="mini" v-model="form.delegateExpression" @change="v=>updateAttr('delegateExpression',v)"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('class')" label="Java Class">
-            <el-input size="mini" v-model="businessObject.class" @change="v=>updateAttr('class',v)"></el-input>
+            <el-input size="mini" v-model="form.class" @change="v=>updateAttr('class',v)"></el-input>
           </el-form-item>
           <el-form-item v-if="shouldShowProperty('resultVariableName')" label="结果变量名">
-            <el-input size="mini" v-model="businessObject.resultVariableName" @change="v=>updateAttr('resultVariableName',v)"></el-input>
+            <el-input size="mini" v-model="form.resultVariableName" @change="v=>updateAttr('resultVariableName',v)"></el-input>
           </el-form-item>
           <!-- 多实例相关属性 -->
           <template v-if="showProperty.MultiInstanceLoopCharacteristics">
@@ -93,25 +90,32 @@
               </el-select>
             </el-form-item>
             <el-form-item label="集合(多实例)">
-              <el-input size="mini" v-model="businessObject.collection" @change="v=>updateMultiInstanceAttr('collection',v)"></el-input>
+              <el-input size="mini" v-model="form.collection" @change="v=>updateMultiInstanceAttr('collection',v)"></el-input>
             </el-form-item>
             <el-form-item label="元素变量(多实例)">
-              <el-input size="mini" v-model="businessObject.elementVariable" @change="v=>updateMultiInstanceAttr('elementVariable',v)"></el-input>
+              <el-input size="mini" v-model="form.elementVariable" @change="v=>updateMultiInstanceAttr('elementVariable',v)"></el-input>
             </el-form-item>
             <el-form-item label="基数(多实例)">
-              <el-input size="mini" v-model="businessObject.loopCardinality" @change="v=>updateMultiInstanceAttr('loopCardinality',v)"></el-input>
+              <el-input size="mini" v-model="form.loopCardinality" @change="v=>updateMultiInstanceAttr('loopCardinality',v)"></el-input>
             </el-form-item>
             <el-form-item label="完成条件(多实例)">
-              <el-input size="mini" v-model="businessObject.completionCondition" @change="v=>updateMultiInstanceAttr('completionCondition',v)"></el-input>
+              <el-input size="mini" v-model="form.completionCondition" @change="v=>updateMultiInstanceAttr('completionCondition',v)"></el-input>
             </el-form-item>
           </template>
 
           <!-- connection参数 -->
-          <template v-if="shouldShowProperty('SequenceFlow')">
-            <el-form-item :label="businessObject.conditionExpression?'流程类型: 条件流程':'流程类型: 顺序流程'">
+          <template v-if="['bpmn:SequenceFlow'].includes(businessObject.$type)">
+            <el-form-item label="Condition Type">
+              {{conditionType}}
+              <el-select size="mini" style="width:100%" v-model="conditionType" placeholder="请选择" @change="updateConditionType">
+                <el-option v-for="item in conditionTypeList" :key="item"
+                  :label="item" :value="item">
+                </el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item v-if="showProperty.conditionExpression" label="条件表达式">
-              <el-select size="mini" style="width:100%" v-if="businessObject.conditionExpression" v-model="businessObject.conditionExpression.body" placeholder="请选择" @change="updateProperties">
+            <el-form-item v-if="conditionType=='Expression'" label="Expression">
+              <!-- <el-input size="mini" v-model="form.conditionExpression.body" @change="v=>updateAttr('conditionExpression',form.conditionExpression)"></el-input> -->
+              <el-select size="mini" style="width:100%" v-model="form.conditionExpression.body" placeholder="请选择" @change="updateConditionType">
                 <el-option v-for="item in conditionExpressionList" :key="item.id"
                   :label="item.id" :value="item.value">
                 </el-option>
@@ -233,7 +237,8 @@ export default {
       executionListenerEvent: ['start', 'end'],
       listenerTypeList: [{name: 'Java class', value: 'class'}, {name: '表达式', value: 'expression'}, {name: '代理表达式', value: 'delegateExpression'}],
       listenerTypeSelected: '',
-      extensionElementsType: ["bpmn:StartEvent", "bpmn:Activity", "bpmn:Gateway"],
+      extensionElements:'',
+      extensionElementsType: ["bpmn:StartEvent", "bpmn:Activity"],
       eventTypeHandle:{
         'bpmn:UserTask':{
           handle:'userTaskHandle'
@@ -249,18 +254,20 @@ export default {
         }
       },
       timeDefinitionTypeList:[
-        {name: '开始时间', value: 'Date'},
-        {name: '持续时间', value: 'Duration'},
-        {name: '循环时间', value: 'Cycle'}
+        'Date','Duration','Cycle'
       ],
       timeDefinitionType:'',
       startEventType:'',
       FormalExpression:'',
+      conditionTypeList:['Expression',''],
+      conditionType:'',
       conditionExpressionList: [
         {id: 1, value: '${processTransferType=="1"}'},
         {id: 2, value: '${processTransferType=="2"}'},
         {id: 3, value: '${processTransferType=="3"}'}
       ],
+      // isInitiatorCanComplete: false, // 发起人是否能结束
+      // initiatorCanCompletes: '', // <modeler:initiator-can-complete> 属性
       initiatorCanComplete: {
         value: '',
         checked: false
@@ -284,18 +291,16 @@ export default {
       return this.listenerTypeSelected === 'delegateExpression'
     },
     showIniatorCanComplete() {
-      return this.businessObject? (this.businessObject.assignee? true:false):false
+      return this.form.assignee
     }
   },
   watch: {
     showIniatorCanComplete(newVal, oldVal) {
-      if (this.shouldShowProperty('assignee')) {
-        if (newVal && !this.initiatorCanComplete.value) {
+      if (newVal && !this.initiatorCanComplete.value) {
         this.addInitiatorCanComplete()
-        }
-        if (!newVal && this.businessObject.extensionElements) {
-          this.delInitiatorCanComplete()
-        }
+      }
+      if (!newVal) {
+        this.delInitiatorCanComplete()
       }
     }
   },
@@ -306,14 +311,14 @@ export default {
     init(){
       this.show = true
       this.activeName='general'
-      
       if(isAny(this.businessObject, this.extensionElementsType)){
-        this.businessObject.extensionElements = this.businessObject.extensionElements || this.moddle.create('bpmn:ExtensionElements',{ values: [] })
+        this.extensionElements= this.businessObject.extensionElements || this.moddle.create('bpmn:ExtensionElements',{ values: [] })
       }
-      this.currentRowTaskListener = ''
-      this.currentRowExecutionListener = ''
       this.handle(this.businessObject.$type)
       this.defaultHandle()
+      this.currentRowTaskListener = ''
+      this.currentRowExecutionListener = ''
+      this.form = this.businessObject
     },
     // 默认处理
     defaultHandle(){
@@ -325,6 +330,9 @@ export default {
         this.extensionElementsHandle()
       }
 
+      if(['bpmn:SequenceFlow'].includes(this.businessObject.$type)){
+        this.conditionType = this.businessObject.conditionExpression?'Expression':''
+      }
       this.multiInstance.type = ''
       if (this.businessObject.loopCharacteristics) {
         if (this.businessObject.loopCharacteristics.isSequential) {
@@ -336,11 +344,22 @@ export default {
     },
     // 扩展元素处理
     extensionElementsHandle(){
+      // this.taskListener = this.extensionElements.values.filter((item) => {
+      //   return is(item, 'flowable:TaskListener')
+      // })
       this.taskListener = getExtensionAll(this.businessObject, 'flowable:TaskListener')
+      // this.executionListener = this.extensionElements.values.filter((item) => {
+      //   return is(item, 'flowable:ExecutionListener')
+      // })
       this.executionListener = getExtensionAll(this.businessObject, 'flowable:ExecutionListener')
+      // this.initiatorCanComplete.value = this.extensionElements.values.filter((item) => {
+      //   return is(item, 'modeler:initiator-can-complete')
+      // })[0]
       this.initiatorCanComplete.value = getExtension(this.businessObject, 'modeler:initiator-can-complete')
       if (this.initiatorCanComplete.value) {
-        this.initiatorCanComplete.checked = this.initiatorCanComplete.value.body
+        this.initiatorCanComplete.checked = this.extensionElements.values.filter((item) => {
+          return is(item, 'modeler:initiator-can-complete')
+        })[0].body === 'true'
       }
     },
     // 改变节点类型处理
@@ -362,7 +381,7 @@ export default {
      * 因为很多操作都会涉及到这个event，避免太多重复动作，只有当在图形上切换后属性面板需要变化的才在这里处理
      */
     showPostUpdateProperties() {
-      // console.log('showPostUpdateProperties', JSON.stringify(this.event))
+      // console.log('showPostUpdateProperties', this.event)
       for (let i in this.showProperty) {
         this.showProperty[i] = isShouldShowByType(i, this.businessObject)
       }
@@ -384,6 +403,7 @@ export default {
       } else {
         this.startEventType = 'startEventType'
       }
+      console.log(type)
     },
     //用户事件处理
     userTaskHandle(type){
@@ -408,6 +428,8 @@ export default {
         this.timeDefinitionType = 'Cycle'
       }
       if(this.timeDefinitionType){
+        console.log('eventDefinitions[0]', this.businessObject.eventDefinitions[0])
+        console.log('time${this.timeDefinitionType}',`time${this.timeDefinitionType}` )
         this.FormalExpression = this.businessObject.eventDefinitions[0][`time${this.timeDefinitionType}`]
       }
     },
@@ -468,22 +490,19 @@ export default {
     //修改表单
     updateAttr(type,v){
       this.businessObject[type]=v
-      // 下面这句话事为了解决一个奇怪的问题，当勾选“是否异步”这样的默认属性是Boolean类型的情况，
-      // 如果不对businessObject进行随便的处理，会导致勾选结果不能及时生效
-      this.executionListener = getExtensionAll(this.businessObject, 'flowable:ExecutionListener')
       this.updateProperties()
     },
     // 删除任务监听器
     delTaskListener(){
-      let i = this.businessObject.extensionElements.values.findIndex(e=>e.id==this.currentRowTaskListener.id)
-      this.businessObject.extensionElements.values.splice(i,1)
+      let i = this.extensionElements.values.findIndex(e=>e.id==this.currentRowTaskListener.id)
+      this.extensionElements.values.splice(i,1)
       this.currentRowTaskListener = ''
       this.updateProperties()
     },
     // 删除执行监听器
     delExecutionListener(){
-      let i = this.businessObject.extensionElements.values.findIndex(e=>e.id==this.currentRowExecutionListener.id)
-      this.businessObject.extensionElements.values.splice(i,1)
+      let i = this.extensionElements.values.findIndex(e=>e.id==this.currentRowExecutionListener.id)
+      this.extensionElements.values.splice(i,1)
       this.currentRowExecutionListener = ''
       this.updateProperties()
     },
@@ -491,15 +510,17 @@ export default {
     addTaskListener() {
       //flowable:TaskListener里的TaskListener要与flowable.json保持
       let taskListener = this.moddle.create('flowable:TaskListener',{id: "TaskListener_"+this.random(100000,999999)});
-      this.businessObject.extensionElements.get('values').push(taskListener);
+      this.extensionElements.get('values').push(taskListener);
       this.updateProperties()
+      console.log(this.taskListener,this.extensionElements)
     },
     // 新增执行监听器
     addExecutionListener() {
       //flowable:ExecutionListener里的ExecutionListener要与flowable.json保持
       let executionListener = this.moddle.create('flowable:ExecutionListener',{id: "ExecutionListener_"+this.random(100000,999999)});
-      this.businessObject.extensionElements.get('values').push(executionListener);
+      this.extensionElements.get('values').push(executionListener);
       this.updateProperties()
+      console.log(this.executionListener,this.extensionElements)
     },
     // 选中TaskListener
     handleCurrentChangeTaskListener(row){
@@ -539,29 +560,51 @@ export default {
     },
     // 删除flowable的modeler扩展项
     delInitiatorCanComplete(){
-      let i = this.businessObject.extensionElements.values.findIndex(e=>e.id.split("_")[0]=='initiatorCanComplete')
-      this.businessObject.extensionElements.values.splice(i,1)
+      let i = this.extensionElements.values.findIndex(e=>e.id.split("_")[0]=='initiatorCanComplete')
+      this.extensionElements.values.splice(i,1)
       this.updateProperties()
     },
     // 新增flowable的modeler扩展项
     addInitiatorCanComplete() {
-      let initiatorCanCompleteObj = this.moddle.create('modeler:initiator-can-complete',{id: "initiatorCanComplete_"+this.random(100000,999999), body: false});
-      this.businessObject.extensionElements.get('values').push(initiatorCanCompleteObj);
+      let initiatorCanCompleteObj = this.moddle.create('modeler:initiator-can-complete',{id: "initiatorCanComplete_"+this.random(100000,999999), body: "false"});
+      this.extensionElements.get('values').push(initiatorCanCompleteObj);
       this.updateProperties()
+      console.log(this.initiatorCanComplete.value,this.extensionElements)
     },
     // 更新flowable的modeler扩展项
     updateInitiatorCanComplete(v) {
-      let i = this.businessObject.extensionElements.values.findIndex(e=>e.id.split("_")[0]=='initiatorCanComplete')
+      let i = this.extensionElements.values.findIndex(e=>e.id.split("_")[0]=='initiatorCanComplete')
       if (v) {
-        this.businessObject.extensionElements.values[i].body = true
+        this.extensionElements.values[i].body = 'true'
       } else {
-        this.businessObject.extensionElements.values[i].body = false
+        this.extensionElements.values[i].body = 'false'
       }
       this.updateProperties()
+    },
+    // 发起人是否能结束流程
+    initiatorCanCompleteChange(v) {
+      if (v) {
+        this.updateInitiatorCanComplete(true)
+      } else {
+        this.updateInitiatorCanComplete(false)
+      }
     },
     // 修改businessObject
     updateProperties(){
       let obj = {}
+      obj.documentation = this.businessObject.documentation&&this.businessObject.documentation.length?this.businessObject.documentation:[this.moddle.create('bpmn:Documentation',{text:""})]
+      if(isAny(this.businessObject, this.extensionElementsType)){
+        obj.extensionElements=this.extensionElements
+      }
+      if(['bpmn:TimerEventDefinition'].includes(this.businessObject.$type)){
+        obj.eventDefinitions=this.businessObject.eventDefinitions
+      }
+      if(['bpmn:SequenceFlow'].includes(this.businessObject.$type)){
+        obj.conditionExpression=this.businessObject.conditionExpression
+      }
+      if(this.shouldShowProperty('multiInstance')){
+        obj.loopCharacteristics=this.businessObject.loopCharacteristics
+      }
       this.defaultHandle()
       this.modeling.updateProperties(this.element, obj);
       console.log('businessObjectInPanel', this.businessObject)

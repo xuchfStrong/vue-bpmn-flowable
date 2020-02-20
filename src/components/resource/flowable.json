@@ -202,7 +202,8 @@
         {
           "name": "formFieldValidation",
           "isAttr": true,
-          "type": "String"
+          "type": "Boolean",
+          "default": false
         }
       ]
     },
