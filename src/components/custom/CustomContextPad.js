@@ -1,3 +1,4 @@
+import { is } from "bpmn-js/lib/util/ModelUtil"
 export default class CustomContextPad {
   constructor(config, contextPad, create, elementFactory, injector, translate) {
     this.create = create;
@@ -51,26 +52,31 @@ export default class CustomContextPad {
       create.start(event, shape, element);
     }
 
-    return {
-      'append.service-task': {
-        group: 'model',
-        className: 'bpmn-icon-service-task',
-        title: translate('Append ServiceTask'),
-        action: {
-          click: appendServiceTask,
-          dragstart: appendServiceTaskStart
+    // 根据条件判断是否显示在contextPad中
+    if (!is(element, 'bpmn:SequenceFlow')) {
+      return {
+        'append.service-task': {
+          group: 'model',
+          className: 'bpmn-icon-service-task',
+          title: translate('Append ServiceTask'),
+          action: {
+            click: appendServiceTask,
+            dragstart: appendServiceTaskStart
+          }
+        },
+        'append.user-task': {
+          group: 'model',
+          className: 'bpmn-icon-user-task',
+          title: translate('Append UserTask'),
+          action: {
+            click: appendUserTask,
+            dragstart: appendUserTaskStart
+          }
         }
-      },
-      'append.user-task': {
-        group: 'model',
-        className: 'bpmn-icon-user-task',
-        title: translate('Append UserTask'),
-        action: {
-          click: appendUserTask,
-          dragstart: appendUserTaskStart
-        }
-      }
-    };
+      };
+    } else {
+      return null
+    }
   }
 }
 

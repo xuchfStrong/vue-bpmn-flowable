@@ -84,8 +84,13 @@ export default {
         bjsIoLogo.removeChild(bjsIoLogo.firstChild)
       }
     },
-    // 找出连接线元素
+    // 找出连接线元素,两种方法都能找到
     getSequenceFlow(bpmnViewer) {
+      const elementRegistry = bpmnViewer.get('elementRegistry')
+      const flowElements1 = elementRegistry.getAll()
+      const sequenceFlow1 = flowElements1.filter(item => {
+        return is(item, 'bpmn:SequenceFlow') && item.type !== 'label'
+      })
       const flowElements = bpmnViewer._definitions.rootElements[0].flowElements
       const sequenceFlow = flowElements.filter(item => {
         return is(item, 'bpmn:SequenceFlow')
