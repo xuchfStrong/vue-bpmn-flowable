@@ -10,8 +10,8 @@
           <el-form-item label="名称">
             <el-input size="mini" v-model="businessObject.name" @change="v=>updateAttr('name',v)"></el-input>
           </el-form-item>
-          <el-form-item label="描述" v-if="businessObject.documentation&&businessObject.documentation[0]">
-            <el-input type="textarea" size="mini" autosize v-model="businessObject.documentation[0].text" @change="v=>updateAttr('documentation',businessObject.documentation)"></el-input>
+          <el-form-item label="描述">
+            <el-input type="textarea" size="mini" autosize v-model="documentation" @change="v=>updateAttr('documentation',v)"></el-input>
           </el-form-item>
           
           <template v-if="['bpmn:StartEvent'].includes(businessObject.$type)">
@@ -108,7 +108,7 @@
 
           <!-- connection参数 -->
           <template v-if="shouldShowProperty('SequenceFlow')">
-            <el-form-item :label="businessObject.conditionExpression?'流程类型: 条件流程':'流程类型: 顺序流程'">
+            <el-form-item :label="businessObject.conditionExpression?'流程类型: 条件流程':''">
             </el-form-item>
             <el-form-item v-if="showProperty.conditionExpression" label="条件表达式">
               <el-select size="mini" style="width:100%" v-if="businessObject.conditionExpression" v-model="businessObject.conditionExpression.body" placeholder="请选择" @change="updateProperties">
@@ -204,7 +204,7 @@
 import { isShouldShowProperty, isShouldShowByType, getExtension, getExtensionAll } from './utils/PanelUtils'
 import { is } from "bpmn-js/lib/util/ModelUtil"
 import { isAny } from "bpmn-js/lib/features/modeling/util/ModelingUtil"
-import { showProperty } from './utils/PanelData'
+import { defaultShowProperty } from './utils/PanelData'
 export default {
   props:{
     element:{},
@@ -220,11 +220,12 @@ export default {
   data(){
     return {
       show:false,
-      showProperty: showProperty,
+      showProperty: Object.assign({}, defaultShowProperty),
       activeName:'general',
       form:{
         documentation:[{}],
       },
+      documentation: '',
       taskListener: [],
       executionListener: [],
       currentRowTaskListener:'',
@@ -306,21 +307,26 @@ export default {
     init(){
       this.show = true
       this.activeName='general'
+      this.showProperty = Object.assign({}, defaultShowProperty)
       
       if(isAny(this.businessObject, this.extensionElementsType)){
         this.businessObject.extensionElements = this.businessObject.extensionElements || this.moddle.create('bpmn:ExtensionElements',{ values: [] })
       }
+      this.documentation = this.businessObject.documentation? this.businessObject.documentation[0].text : ''
       this.currentRowTaskListener = ''
       this.currentRowExecutionListener = ''
       this.handle(this.businessObject.$type)
       this.defaultHandle()
     },
+    // 修改businessObject
+    updateProperties(){
+      let obj = {}
+      this.defaultHandle()
+      console.log('businessObjectInPanel', this.businessObject)
+    },
     // 默认处理
-    defaultHandle(){
-      let documentation = this.businessObject.documentation&&this.businessObject.documentation.length?this.businessObject.documentation:[this.moddle.create('bpmn:Documentation',{text:""})]
-      let obj = {documentation}
-      this.modeling.updateProperties(this.element,obj)
-      
+    defaultHandle(){ 
+      let obj = {}     
       if(isAny(this.businessObject, this.extensionElementsType)){
         this.extensionElementsHandle()
       }
@@ -333,6 +339,7 @@ export default {
           this.multiInstance.type = 'parallel'
         }
       }
+      this.modeling.updateProperties(this.element, obj);
     },
     // 扩展元素处理
     extensionElementsHandle(){
@@ -354,7 +361,7 @@ export default {
       } catch(error) {
         console.log('replace error', error)
       }
-      this.init()
+      // this.init()
     },
 
     /**
@@ -467,7 +474,11 @@ export default {
     },
     //修改表单
     updateAttr(type,v){
-      this.businessObject[type]=v
+      if (type === 'documentation') {
+        this.businessObject.documentation = [this.moddle.create('bpmn:Documentation',{text:v})]
+      } else {
+        this.businessObject[type]=v
+      }
       // 下面这句话事为了解决一个奇怪的问题，当勾选“是否异步”这样的默认属性是Boolean类型的情况，
       // 如果不对businessObject进行随便的处理，会导致勾选结果不能及时生效
       this.executionListener = getExtensionAll(this.businessObject, 'flowable:ExecutionListener')
@@ -539,32 +550,27 @@ export default {
     },
     // 删除flowable的modeler扩展项
     delInitiatorCanComplete(){
-      let i = this.businessObject.extensionElements.values.findIndex(e=>e.id.split("_")[0]=='initiatorCanComplete')
+      let i = this.businessObject.extensionElements.values.findIndex(e=>is(e, 'modeler:initiator-can-complete'))
       this.businessObject.extensionElements.values.splice(i,1)
       this.updateProperties()
     },
     // 新增flowable的modeler扩展项
     addInitiatorCanComplete() {
-      let initiatorCanCompleteObj = this.moddle.create('modeler:initiator-can-complete',{id: "initiatorCanComplete_"+this.random(100000,999999), body: false});
-      this.businessObject.extensionElements.get('values').push(initiatorCanCompleteObj);
-      this.updateProperties()
+      if (!this.businessObject.extensionElements.values.find(e=>is(e, 'modeler:initiator-can-complete'))) {
+        let initiatorCanCompleteObj = this.moddle.create('modeler:initiator-can-complete',{id: "initiatorCanComplete_"+this.random(100000,999999), body: false});
+        this.businessObject.extensionElements.get('values').push(initiatorCanCompleteObj);
+        this.updateProperties()
+      }
     },
     // 更新flowable的modeler扩展项
     updateInitiatorCanComplete(v) {
-      let i = this.businessObject.extensionElements.values.findIndex(e=>e.id.split("_")[0]=='initiatorCanComplete')
+      let i = this.businessObject.extensionElements.values.findIndex(e=>is(e, 'modeler:initiator-can-complete'))
       if (v) {
         this.businessObject.extensionElements.values[i].body = true
       } else {
         this.businessObject.extensionElements.values[i].body = false
       }
       this.updateProperties()
-    },
-    // 修改businessObject
-    updateProperties(){
-      let obj = {}
-      this.defaultHandle()
-      this.modeling.updateProperties(this.element, obj);
-      console.log('businessObjectInPanel', this.businessObject)
     },
     // 获取随机数
     random(lower, upper) {

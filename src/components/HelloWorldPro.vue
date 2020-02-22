@@ -58,6 +58,7 @@ import customTranslate from './translate';
 import customControlsModule from './custom';
 import { getBusinessObject, is } from "bpmn-js/lib/util/ModelUtil";
 import { isAny } from "bpmn-js/lib/features/modeling/util/ModelingUtil";
+import { random } from './utils/PanelUtils'
 import panel from "./panel";
 
 export default {
@@ -115,12 +116,17 @@ export default {
       // 将字符串转换成图显示出来
       this.bpmnModeler.importXML(bpmnXmlStr, function(err) {
         if (err) {
-          console.error(err);
+          console.error(err)
+        } else {
+          _this.moddle = _this.bpmnModeler.get("moddle")
+          _this.modeling = _this.bpmnModeler.get("modeling")
+          const canvas = _this.bpmnModeler.get("canvas")
+          const rootElement = canvas.getRootElement()
+          _this.businessObject = getBusinessObject(rootElement) // 为了避免更新rootElement的id的时候，没有businessObject传入panel中导致报错
+          _this.modeling.updateProperties(rootElement,{id: "Process_" + random(100000,999999)})
+          // _this.addEventBusListener()
         }
-        _this.moddle = _this.bpmnModeler.get("moddle");
-        _this.modeling = _this.bpmnModeler.get("modeling");
-        // _this.addEventBusListener()
-      });
+      })
     },
     // 下载为SVG格式,done是个函数，调用的时候传入的
     saveSVG(done) {
@@ -242,9 +248,12 @@ export default {
     // 改变节点属性
     this.bpmnModeler.on("commandStack.element.updateProperties.postExecute", event => {
       _this.event = event
-      _this.$nextTick(() => {
-        _this.$refs.panel.showPostUpdateProperties()
-      })
+      const types = ['bpmn:Activity', 'bpmn:SequenceFlow']
+      if (isAny(event.context.element, types)) {
+        _this.$nextTick(() => {
+          _this.$refs.panel.showPostUpdateProperties()
+        })
+      }
     })
     this.createNewDiagram(this.bpmnModeler);
   }

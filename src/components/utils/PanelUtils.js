@@ -91,7 +91,7 @@ export function isShouldShowByType(type, businessObject) {
 
 export function getExtension(businessObject, type) {
   if (!businessObject.extensionElements) {
-    return null;
+    return;
   }
   return businessObject.extensionElements.values.filter(function(e) {
     return e.$instanceOf(type);
@@ -100,10 +100,15 @@ export function getExtension(businessObject, type) {
 
 export function getExtensionAll(businessObject, type) {
   if (!businessObject.extensionElements) {
-    return null;
+    return;
   }
   return businessObject.extensionElements.values.filter(function(e) {
     return e.$instanceOf(type);
   })
+}
+
+// 生成随机数
+export function random(lower, upper) {
+  return Math.floor(Math.random() * (upper - lower)) + lower;
 }
 

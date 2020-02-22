@@ -1,4 +1,4 @@
-export const showProperty = {
+export const defaultShowProperty = {
   MultiInstanceLoopCharacteristics: false,
   conditionExpression: false
 }
